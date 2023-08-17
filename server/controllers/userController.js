@@ -18,3 +18,19 @@ export const createUser = asyncHandler(async (req, res) => {
     res.status(201).send({ message: 'User already registered' });
   }
 });
+
+// function to book a residency
+export const bookVisit = asyncHandler(async (req, res) => {
+  const { email, data} = req.body;
+
+  const { id } = req.params;
+
+  try {
+    const alreadyBooked = await prisma.user.findUnique({
+      where: { email: email },
+      select: { bookedVisits: true }
+    })
+  } catch (err) {
+    throw new Error(err.message)
+  }
+}
