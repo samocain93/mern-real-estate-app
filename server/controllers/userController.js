@@ -88,9 +88,51 @@ export const cancelBooking = asyncHandler(async (req, res) => {
         },
       });
 
-      res.send("Booking cancelled successfully")
+      res.send('Booking cancelled successfully');
     }
   } catch (error) {
     throw new Error(error.message);
   }
 });
+
+// function to add a favorites residency
+export const addToFavorites = asyncHandler(async (req, res) => {
+  const { email } = req.body;
+  const { rid } = req.params;
+
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email },
+    });
+
+    if (user.favResidenciesID.includes(rid)) {
+      const updatedUser = await prisma.user.update({
+        where: { email },
+        data: {
+          favResidenciesID: {
+            set: user.favResidenciesID.filter((id) => id !== rid),
+          },
+        },
+      });
+
+      res.send({ message: 'Removed from favorites', user: updatedUser });
+    } else {
+      const updatedUser = await prisma.user.update({
+        where: { email },
+        data: {
+          favResidenciesID: {
+            push: rid,
+          },
+        },
+      });
+      res.send({ message: 'Updated favorites', user: updatedUser });
+    }
+  } catch (error) {
+    throw new Error(error.message);
+  }
+});
+
+// function to get all favorites
+export const getAllFavorites = asyncHandler(async (req, res) => {
+  
+})
